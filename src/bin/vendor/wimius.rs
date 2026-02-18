@@ -1,3 +1,5 @@
+use crate::com::ir::IRController;
+
 /// Enumeration of every control available on original remote.
 pub enum WimiusS27Control {
     ButtonPower,
@@ -17,13 +19,15 @@ pub enum WimiusS27Control {
 
 /// Remote controller interface.
 pub struct WimiusS27RemoteControl {
-    // TODO: add IR controller.
+    ir_controller: &IRController,
 }
 
 impl WimiusS27RemoteControl {
-    pub fn new() -> WimiusS27RemoteControl {
+    pub fn new(
+        ir_controller: &IRController,
+    ) -> WimiusS27RemoteControl {
         WimiusS27RemoteControl {
-            // TODO: add attr if provided.
+            ir_controller: ir_controller,
         }
     }
 

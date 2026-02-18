@@ -1,3 +1,5 @@
+use super::super::com::ir::IRController;
+
 /// Enumeration of every control available on original remote.
 pub enum AppleTVControl {
     ButtonOK,
@@ -10,14 +12,22 @@ pub enum AppleTVControl {
 }
 
 /// Remote controller interface.
-pub struct AppleTVRemoteControl {
-    // TODO: add IR controller.
+pub struct AppleTVRemoteControl<C>
+where
+    C: IRController,
+{
+    ir_controller: &C,
 }
 
-impl AppleTVRemoteControl {
-    pub fn new() -> AppleTVRemoteControl {
+impl AppleTVRemoteControl<C>
+where
+    C: IRController
+{
+    pub fn new(
+        ir_controller: &C,
+    ) -> AppleTVRemoteControl<C> {
         AppleTVRemoteControl {
-            // TODO: add attr if provided.
+            ir_controller: ir_controller,
         }
     }
 
