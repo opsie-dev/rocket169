@@ -1,4 +1,4 @@
-use super::super::com::ir::IRController;
+use rocket169::device::RemoteController;
 
 /// Enumeration of every control available on original remote.
 pub enum AppleTVControl {

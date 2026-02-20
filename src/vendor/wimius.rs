@@ -18,14 +18,20 @@ pub enum WimiusS27Control {
 }
 
 /// Remote controller interface.
-pub struct WimiusS27RemoteControl {
-    ir_controller: &IRController,
+pub struct WimiusS27RemoteControl<'a, C>
+where
+    C: IRController
+{
+    ir_controller: &'a C,
 }
 
-impl WimiusS27RemoteControl {
+impl<'a, C> WimiusS27RemoteControl<'a, C> 
+where 
+    C: IRController
+{
     pub fn new(
-        ir_controller: &IRController,
-    ) -> WimiusS27RemoteControl {
+        ir_controller: &C,
+    ) -> WimiusS27RemoteControl<'a, C> {
         WimiusS27RemoteControl {
             ir_controller: ir_controller,
         }
