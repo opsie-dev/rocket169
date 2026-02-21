@@ -8,13 +8,9 @@
 #![deny(clippy::large_stack_frames)]
 
 use esp_backtrace as _;
-use esp_hal::clock::CpuClock;
 use esp_hal::Config as HALConfig;
-use esp_hal::gpio::{
-    Level,
-    Output,
-    OutputConfig,
-};
+use esp_hal::clock::CpuClock;
+use esp_hal::gpio::{Level, Output, OutputConfig};
 use esp_hal::main;
 use esp_hal::time::{Duration, Instant};
 use esp_hal::uart::{Config as UartConfig, Uart};
@@ -58,10 +54,10 @@ impl RemoteControllerOutputs {
     }
     fn activate_led(&mut self, led: RemoteControllerLED) -> () {
         match self.activated_led {
-            None => {},
+            None => {}
             Some(led) => {
                 self.deactivate_led(led);
-            },
+            }
         }
         match led {
             RemoteControllerLED::Apple => self.led_apple.set_high(),
@@ -82,12 +78,14 @@ impl RemoteControllerOutputs {
     }
     fn on_event_loop_iteration(&mut self) -> () {
         match self.activated_led {
-            None => {},
+            None => {}
             Some(led) => {
-                if self.activated_led_instant.unwrap_or(self.uptime).elapsed() >= LED_ACTIVATION_DURATION {
-                    self.deactivate_led(led);                    
+                if self.activated_led_instant.unwrap_or(self.uptime).elapsed()
+                    >= LED_ACTIVATION_DURATION
+                {
+                    self.deactivate_led(led);
                 }
-            },
+            }
         };
     }
 }
@@ -105,7 +103,7 @@ fn main() -> ! {
         .unwrap()
         .with_rx(peripherals.GPIO1)
         .with_tx(peripherals.GPIO2);
-    let output_configuration =  OutputConfig::default();
+    let output_configuration = OutputConfig::default();
     let mut outputs = RemoteControllerOutputs::new(
         Output::new(peripherals.GPIO12, Level::High, output_configuration),
         Output::new(peripherals.GPIO13, Level::High, output_configuration),
@@ -124,14 +122,14 @@ fn main() -> ! {
             match RemoteControllerInputEvent::from_byte(buffer[0]) {
                 RemoteControllerInputEvent::InputSourceApple => {
                     outputs.activate_led(RemoteControllerLED::Apple);
-                },
+                }
                 RemoteControllerInputEvent::InputSourceTriangle => {
                     outputs.activate_led(RemoteControllerLED::Triangle);
-                },
+                }
                 RemoteControllerInputEvent::InputSourceWimius => {
                     outputs.activate_led(RemoteControllerLED::Wimius);
-                },
-                _ => {},
+                }
+                _ => {}
             };
         }
         outputs.on_event_loop_iteration();

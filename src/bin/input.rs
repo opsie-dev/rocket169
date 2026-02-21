@@ -1,4 +1,4 @@
-    #![no_std]
+#![no_std]
 #![no_main]
 #![deny(
     clippy::mem_forget,
@@ -7,13 +7,9 @@
 )]
 #![deny(clippy::large_stack_frames)]
 use esp_backtrace as _;
-use esp_hal::clock::CpuClock;
 use esp_hal::Config as HALConfig;
-use esp_hal::gpio::{
-    Input,
-    InputConfig,
-    Pull,
-};
+use esp_hal::clock::CpuClock;
+use esp_hal::gpio::{Input, InputConfig, Pull};
 use esp_hal::main;
 use esp_hal::uart::{Config as UartConfig, Uart};
 use log::debug;
@@ -29,14 +25,8 @@ struct RemoteControllerInput {
 }
 
 impl RemoteControllerInput {
-    fn new(
-        event: RemoteControllerInputEvent,
-        input: Input<'static>,
-    ) -> RemoteControllerInput {
-        RemoteControllerInput {
-            event,
-            input,
-        }
+    fn new(event: RemoteControllerInputEvent, input: Input<'static>) -> RemoteControllerInput {
+        RemoteControllerInput { event, input }
     }
 }
 
@@ -74,31 +64,97 @@ impl RemoteControllerInputs {
     ) -> RemoteControllerInputs {
         RemoteControllerInputs {
             inputs: [
-                RemoteControllerInput::new(RemoteControllerInputEvent::HDMISource1, hdmi_source_1_input),
-                RemoteControllerInput::new(RemoteControllerInputEvent::HDMISource2, hdmi_source_2_input),
-                RemoteControllerInput::new(RemoteControllerInputEvent::HDMISource3, hdmi_source_3_input),
-                RemoteControllerInput::new(RemoteControllerInputEvent::InputSourceApple, input_source_apple_input),
-                RemoteControllerInput::new(RemoteControllerInputEvent::InputSourceTriangle, input_source_triangle_input),
-                RemoteControllerInput::new(RemoteControllerInputEvent::InputSourceWimius, input_source_wimius_input),
+                RemoteControllerInput::new(
+                    RemoteControllerInputEvent::HDMISource1,
+                    hdmi_source_1_input,
+                ),
+                RemoteControllerInput::new(
+                    RemoteControllerInputEvent::HDMISource2,
+                    hdmi_source_2_input,
+                ),
+                RemoteControllerInput::new(
+                    RemoteControllerInputEvent::HDMISource3,
+                    hdmi_source_3_input,
+                ),
+                RemoteControllerInput::new(
+                    RemoteControllerInputEvent::InputSourceApple,
+                    input_source_apple_input,
+                ),
+                RemoteControllerInput::new(
+                    RemoteControllerInputEvent::InputSourceTriangle,
+                    input_source_triangle_input,
+                ),
+                RemoteControllerInput::new(
+                    RemoteControllerInputEvent::InputSourceWimius,
+                    input_source_wimius_input,
+                ),
                 RemoteControllerInput::new(RemoteControllerInputEvent::LightOff, light_off_input),
                 RemoteControllerInput::new(RemoteControllerInputEvent::LightOn, light_on_input),
-                RemoteControllerInput::new(RemoteControllerInputEvent::SoundBassDown, sound_bass_down_input),
-                RemoteControllerInput::new(RemoteControllerInputEvent::SoundBassUp, sound_bass_up_input),
-                RemoteControllerInput::new(RemoteControllerInputEvent::SoundEqualizerReset, sound_equalizer_reset_input),
+                RemoteControllerInput::new(
+                    RemoteControllerInputEvent::SoundBassDown,
+                    sound_bass_down_input,
+                ),
+                RemoteControllerInput::new(
+                    RemoteControllerInputEvent::SoundBassUp,
+                    sound_bass_up_input,
+                ),
+                RemoteControllerInput::new(
+                    RemoteControllerInputEvent::SoundEqualizerReset,
+                    sound_equalizer_reset_input,
+                ),
                 RemoteControllerInput::new(RemoteControllerInputEvent::SoundMute, sound_mute_input),
-                RemoteControllerInput::new(RemoteControllerInputEvent::SoundSource, sound_source_input),
-                RemoteControllerInput::new(RemoteControllerInputEvent::SoundTrebleDown, sound_treble_down_input),
-                RemoteControllerInput::new(RemoteControllerInputEvent::SoundTrebleUp, sound_treble_up_input),
-                RemoteControllerInput::new(RemoteControllerInputEvent::SoundVolumeDown, sound_volume_down_input),
-                RemoteControllerInput::new(RemoteControllerInputEvent::SoundVolumeUp, sound_volume_up_input),
-                RemoteControllerInput::new(RemoteControllerInputEvent::TelevisionBack, television_back_input),
-                RemoteControllerInput::new(RemoteControllerInputEvent::TelevisionDown, television_down_input),
-                RemoteControllerInput::new(RemoteControllerInputEvent::TelevisionHome, television_home_input),
-                RemoteControllerInput::new(RemoteControllerInputEvent::TelevisionLeft, television_left_input),
-                RemoteControllerInput::new(RemoteControllerInputEvent::TelevisionMenu, television_menu_input),
-                RemoteControllerInput::new(RemoteControllerInputEvent::TelevisionPlayPause, television_play_pause_input),
-                RemoteControllerInput::new(RemoteControllerInputEvent::TelevisionRight, television_right_input),
-                RemoteControllerInput::new(RemoteControllerInputEvent::TelevisionUp, television_up_input),
+                RemoteControllerInput::new(
+                    RemoteControllerInputEvent::SoundSource,
+                    sound_source_input,
+                ),
+                RemoteControllerInput::new(
+                    RemoteControllerInputEvent::SoundTrebleDown,
+                    sound_treble_down_input,
+                ),
+                RemoteControllerInput::new(
+                    RemoteControllerInputEvent::SoundTrebleUp,
+                    sound_treble_up_input,
+                ),
+                RemoteControllerInput::new(
+                    RemoteControllerInputEvent::SoundVolumeDown,
+                    sound_volume_down_input,
+                ),
+                RemoteControllerInput::new(
+                    RemoteControllerInputEvent::SoundVolumeUp,
+                    sound_volume_up_input,
+                ),
+                RemoteControllerInput::new(
+                    RemoteControllerInputEvent::TelevisionBack,
+                    television_back_input,
+                ),
+                RemoteControllerInput::new(
+                    RemoteControllerInputEvent::TelevisionDown,
+                    television_down_input,
+                ),
+                RemoteControllerInput::new(
+                    RemoteControllerInputEvent::TelevisionHome,
+                    television_home_input,
+                ),
+                RemoteControllerInput::new(
+                    RemoteControllerInputEvent::TelevisionLeft,
+                    television_left_input,
+                ),
+                RemoteControllerInput::new(
+                    RemoteControllerInputEvent::TelevisionMenu,
+                    television_menu_input,
+                ),
+                RemoteControllerInput::new(
+                    RemoteControllerInputEvent::TelevisionPlayPause,
+                    television_play_pause_input,
+                ),
+                RemoteControllerInput::new(
+                    RemoteControllerInputEvent::TelevisionRight,
+                    television_right_input,
+                ),
+                RemoteControllerInput::new(
+                    RemoteControllerInputEvent::TelevisionUp,
+                    television_up_input,
+                ),
             ],
         }
     }
@@ -160,8 +216,8 @@ fn main() -> ! {
                     0
                 }
                 Ok(i) => i,
-            }
-            None => 0
+            },
+            None => 0,
         };
         debug!("{} byte(s) written to UART0", n);
     }
