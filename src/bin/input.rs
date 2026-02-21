@@ -8,10 +8,13 @@
 #![deny(clippy::large_stack_frames)]
 use esp_backtrace as _;
 use esp_hal::clock::CpuClock;
+use esp_hal::Config as HALConfig;
 use esp_hal::main;
 use esp_hal::time::{Duration, Instant};
+use esp_hal::uart::{Config as UartConfig, Uart};
+use log::debug;
 use log::info;
-use rocket169::controller::RemoteControllerInputs;
+use rocket169::input::RemoteControllerInputs;
 
 esp_bootloader_esp_idf::esp_app_desc!();
 
@@ -22,13 +25,28 @@ esp_bootloader_esp_idf::esp_app_desc!();
 #[main]
 fn main() -> ! {
     esp_println::logger::init_logger_from_env();
-    let configuration = esp_hal::Config::default().with_cpu_clock(CpuClock::max());
+    let configuration = HALConfig::default().with_cpu_clock(CpuClock::max());
     let peripherals = esp_hal::init(configuration);
+    let mut uart = Uart::new(
+        peripherals.UART0,
+        UartConfig::default(),
+    )?.with_tx(peripherals.GPIO0);
     let inputs = RemoteControllerInputs::new(peripherals);
     loop {
-        // TODO: poll inputs.
-        info!("Hello world!");
-        let delay_start = Instant::now();
-        while delay_start.elapsed() < Duration::from_millis(500) {}
+        let n = match inputs.poll() {
+            Some(event) => match uart.write(event.as_uart_message()) {
+                Err(error) => {
+                    // TODO: log error
+                    // TODO: blink uart error led.
+                    0
+                }
+                Ok(i) => i,
+            }
+            None => 0
+        };
+        debug!("{} byte(s) written to UART0", n);
+        // TODO: check if waiting is necessary ?
+        // let delay_start = Instant::now();
+        //while delay_start.elapsed() < Duration::from_millis(500) {}
     }
 }
