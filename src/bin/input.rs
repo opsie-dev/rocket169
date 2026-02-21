@@ -24,12 +24,6 @@ struct RemoteControllerInput {
     input: Input<'static>,
 }
 
-impl RemoteControllerInput {
-    fn new(event: RemoteControllerInputEvent, input: Input<'static>) -> RemoteControllerInput {
-        RemoteControllerInput { event, input }
-    }
-}
-
 #[allow(
     clippy::large_stack_frames,
     reason = "it's not unusual to allocate larger buffers etc. in main"
@@ -45,106 +39,106 @@ fn main() -> ! {
         .with_tx(peripherals.GPIO4);
     let input_configuration = InputConfig::default().with_pull(Pull::Up);
     let inputs: [RemoteControllerInput; REMOTE_CONTROLLER_INPUT_SIZE] = [
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::HDMISource1,
-            Input::new(peripherals.GPIO1, input_configuration),
-        ),
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::HDMISource2,
-            Input::new(peripherals.GPIO12, input_configuration),
-        ),
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::HDMISource3,
-            Input::new(peripherals.GPIO13, input_configuration),
-        ),
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::InputSourceApple,
-            Input::new(peripherals.GPIO14, input_configuration),
-        ),
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::InputSourceTriangle,
-            Input::new(peripherals.GPIO15, input_configuration),
-        ),
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::InputSourceWimius,
-            Input::new(peripherals.GPIO16, input_configuration),
-        ),
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::LightOff,
-            Input::new(peripherals.GPIO17, input_configuration),
-        ),
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::LightOn,
-            Input::new(peripherals.GPIO18, input_configuration),
-        ),
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::SoundBassDown,
-            Input::new(peripherals.GPIO19, input_configuration),
-        ),
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::SoundBassUp,
-            Input::new(peripherals.GPIO2, input_configuration),
-        ),
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::SoundEqualizerReset,
-            Input::new(peripherals.GPIO21, input_configuration),
-        ),
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::SoundMute,
-            Input::new(peripherals.GPIO22, input_configuration),
-        ),
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::SoundSource,
-            Input::new(peripherals.GPIO23, input_configuration),
-        ),
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::SoundTrebleDown,
-            Input::new(peripherals.GPIO25, input_configuration),
-        ),
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::SoundTrebleUp,
-            Input::new(peripherals.GPIO26, input_configuration),
-        ),
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::SoundVolumeDown,
-            Input::new(peripherals.GPIO27, input_configuration),
-        ),
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::SoundVolumeUp,
-            Input::new(peripherals.GPIO3, input_configuration),
-        ),
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::TelevisionBack,
-            Input::new(peripherals.GPIO32, input_configuration),
-        ),
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::TelevisionDown,
-            Input::new(peripherals.GPIO33, input_configuration),
-        ),
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::TelevisionHome,
-            Input::new(peripherals.GPIO34, input_configuration),
-        ),
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::TelevisionLeft,
-            Input::new(peripherals.GPIO35, input_configuration),
-        ),
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::TelevisionMenu,
-            Input::new(peripherals.GPIO36, input_configuration),
-        ),
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::TelevisionPlayPause,
-            Input::new(peripherals.GPIO37, input_configuration),
-        ),
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::TelevisionRight,
-            Input::new(peripherals.GPIO38, input_configuration),
-        ),
-        RemoteControllerInput::new(
-            RemoteControllerInputEvent::TelevisionUp,
-            Input::new(peripherals.GPIO39, input_configuration),
-        ),
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::HDMISource1,
+            input: Input::new(peripherals.GPIO1, input_configuration),
+        },
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::HDMISource2,
+            input: Input::new(peripherals.GPIO12, input_configuration),
+        },
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::HDMISource3,
+            input: Input::new(peripherals.GPIO13, input_configuration),
+        },
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::InputSourceApple,
+            input: Input::new(peripherals.GPIO14, input_configuration),
+        },
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::InputSourceTriangle,
+            input: Input::new(peripherals.GPIO15, input_configuration),
+        },
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::InputSourceWimius,
+            input: Input::new(peripherals.GPIO16, input_configuration),
+        },
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::LightOff,
+            input: Input::new(peripherals.GPIO17, input_configuration),
+        },
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::LightOn,
+            input: Input::new(peripherals.GPIO18, input_configuration),
+        },
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::SoundBassDown,
+            input: Input::new(peripherals.GPIO19, input_configuration),
+        },
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::SoundBassUp,
+            input: Input::new(peripherals.GPIO2, input_configuration),
+        },
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::SoundEqualizerReset,
+            input: Input::new(peripherals.GPIO21, input_configuration),
+        },
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::SoundMute,
+            input: Input::new(peripherals.GPIO22, input_configuration),
+        },
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::SoundSource,
+            input: Input::new(peripherals.GPIO23, input_configuration),
+        },
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::SoundTrebleDown,
+            input: Input::new(peripherals.GPIO25, input_configuration),
+        },
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::SoundTrebleUp,
+            input: Input::new(peripherals.GPIO26, input_configuration),
+        },
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::SoundVolumeDown,
+            input: Input::new(peripherals.GPIO27, input_configuration),
+        },
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::SoundVolumeUp,
+            input: Input::new(peripherals.GPIO3, input_configuration),
+        },
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::TelevisionBack,
+            input: Input::new(peripherals.GPIO32, input_configuration),
+        },
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::TelevisionDown,
+            input: Input::new(peripherals.GPIO33, input_configuration),
+        },
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::TelevisionHome,
+            input: Input::new(peripherals.GPIO34, input_configuration),
+        },
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::TelevisionLeft,
+            input: Input::new(peripherals.GPIO35, input_configuration),
+        },
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::TelevisionMenu,
+            input: Input::new(peripherals.GPIO36, input_configuration),
+        },
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::TelevisionPlayPause,
+            input: Input::new(peripherals.GPIO37, input_configuration),
+        },
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::TelevisionRight,
+            input: Input::new(peripherals.GPIO38, input_configuration),
+        },
+        RemoteControllerInput {
+            event: RemoteControllerInputEvent::TelevisionUp,
+            input: Input::new(peripherals.GPIO39, input_configuration),
+        },
     ];
     loop {
         let n = match inputs

@@ -16,10 +16,21 @@ use esp_hal::time::{Duration, Instant};
 use esp_hal::uart::{Config as UartConfig, Uart};
 use log::debug;
 use rocket169::event::RemoteControllerInputEvent;
+use rocket169::vendor::apple::{AppleTVControl, AppleTVRemoteControl};
+use rocket169::vendor::triangle::{TriangleBoreaBTControl, TriangleBoreaBTRemoteControl};
+use rocket169::vendor::ugreen::{UGreenAW504Control, UGreenAW504RemoteControl};
+use rocket169::vendor::wimius::{WimiusS27Control, WimiusS27RemoteControl};
 
 esp_bootloader_esp_idf::esp_app_desc!();
 
 const LED_ACTIVATION_DURATION: Duration = Duration::from_secs(5);
+
+#[derive(Copy, Clone)]
+enum RemoteControllerSource {
+    Apple,
+    Triangle,
+    Wimius,
+}
 
 #[derive(Copy, Clone)]
 enum RemoteControllerLED {
@@ -31,9 +42,14 @@ enum RemoteControllerLED {
 struct RemoteControllerOutputs {
     activated_led: Option<RemoteControllerLED>,
     activated_led_instant: Option<Instant>,
+    activated_source: RemoteControllerSource,
     led_apple: Output<'static>,
     led_triangle: Output<'static>,
     led_wimius: Output<'static>,
+    remote_control_apple: AppleTVRemoteControl,
+    remote_control_triangle: TriangleBoreaBTRemoteControl,
+    remote_control_ugreen: UGreenAW504RemoteControl,
+    remote_control_wimius: WimiusS27RemoteControl,
     uptime: Instant,
 }
 
@@ -46,9 +62,14 @@ impl RemoteControllerOutputs {
         RemoteControllerOutputs {
             activated_led: None,
             activated_led_instant: None,
+            activated_source: RemoteControllerSource::Triangle,
             led_apple: led_apple_output,
             led_triangle: led_triangle_output,
             led_wimius: led_wimius_output,
+            remote_control_apple: AppleTVRemoteControl::new(),
+            remote_control_triangle: TriangleBoreaBTRemoteControl::new(),
+            remote_control_ugreen: UGreenAW504RemoteControl::new(),
+            remote_control_wimius: WimiusS27RemoteControl::new(),
             uptime: Instant::now(),
         }
     }
@@ -76,6 +97,14 @@ impl RemoteControllerOutputs {
         self.activated_led = None;
         self.activated_led_instant = None;
     }
+    fn activate_source(&mut self, source: RemoteControllerSource) {
+        self.activated_source = source;
+        match source {
+            RemoteControllerSource::Apple => self.activate_led(RemoteControllerLED::Apple),
+            RemoteControllerSource::Triangle => self.activate_led(RemoteControllerLED::Triangle),
+            RemoteControllerSource::Wimius => self.activate_led(RemoteControllerLED::Wimius),
+        };
+    }
     fn on_event_loop_iteration(&mut self) {
         match self.activated_led {
             None => {}
@@ -86,6 +115,194 @@ impl RemoteControllerOutputs {
                     self.deactivate_led(led);
                 }
             }
+        };
+    }
+
+    fn on_input_event(&mut self, event: RemoteControllerInputEvent) {
+        match event {
+            // NOTE: Handling HDMI source events.
+            RemoteControllerInputEvent::HDMISource1 => {
+                self.remote_control_ugreen
+                    .trigger(UGreenAW504Control::Button1);
+            }
+            RemoteControllerInputEvent::HDMISource2 => {
+                self.remote_control_ugreen
+                    .trigger(UGreenAW504Control::Button2);
+            }
+            RemoteControllerInputEvent::HDMISource3 => {
+                self.remote_control_ugreen
+                    .trigger(UGreenAW504Control::Button3);
+            }
+            // NOTE: Handling input source change events.
+            RemoteControllerInputEvent::InputSourceApple => {
+                self.activate_source(RemoteControllerSource::Apple);
+            }
+            RemoteControllerInputEvent::InputSourceTriangle => {
+                self.activate_source(RemoteControllerSource::Triangle);
+            }
+            RemoteControllerInputEvent::InputSourceWimius => {
+                self.activate_source(RemoteControllerSource::Wimius);
+            }
+            // NOTE: Handling light input events.
+            RemoteControllerInputEvent::LightOff => {
+                // TODO: implements.
+            }
+            RemoteControllerInputEvent::LightOn => {
+                // TODO: implements.
+            }
+            // NOTE: Triangle sound only events.
+            RemoteControllerInputEvent::SoundBassDown => {
+                self.activate_source(RemoteControllerSource::Triangle);
+                self.remote_control_triangle
+                    .trigger(TriangleBoreaBTControl::ButtonBassDown);
+            }
+            RemoteControllerInputEvent::SoundBassUp => {
+                self.activate_source(RemoteControllerSource::Triangle);
+                self.remote_control_triangle
+                    .trigger(TriangleBoreaBTControl::ButtonBassUp);
+            }
+            RemoteControllerInputEvent::SoundEqualizerReset => {
+                self.activate_source(RemoteControllerSource::Triangle);
+                self.remote_control_triangle
+                    .trigger(TriangleBoreaBTControl::ButtonEqualizerReset);
+            }
+            RemoteControllerInputEvent::SoundSource => {
+                self.activate_source(RemoteControllerSource::Triangle);
+                self.remote_control_triangle
+                    .trigger(TriangleBoreaBTControl::ButtonSource);
+            }
+            RemoteControllerInputEvent::SoundTrebleDown => {
+                self.activate_source(RemoteControllerSource::Triangle);
+                self.remote_control_triangle
+                    .trigger(TriangleBoreaBTControl::ButtonTrebleDown);
+            }
+            RemoteControllerInputEvent::SoundTrebleUp => {
+                self.activate_source(RemoteControllerSource::Triangle);
+                self.remote_control_triangle
+                    .trigger(TriangleBoreaBTControl::ButtonTrebleUp);
+            }
+            // NOTE: Multi sound source events.
+            // TODO: handle auto switch for source + led reactivation.
+            RemoteControllerInputEvent::SoundMute => {
+                match self.activated_source {
+                    RemoteControllerSource::Triangle => self
+                        .remote_control_triangle
+                        .trigger(TriangleBoreaBTControl::ButtonVolumeMute),
+                    RemoteControllerSource::Wimius => self
+                        .remote_control_wimius
+                        .trigger(WimiusS27Control::ButtonVolumeMute),
+                    _ => {}
+                };
+            }
+            RemoteControllerInputEvent::SoundVolumeDown => {
+                match self.activated_source {
+                    RemoteControllerSource::Apple => self
+                        .remote_control_apple
+                        .trigger(AppleTVControl::ButtonVolumeDown),
+                    RemoteControllerSource::Triangle => self
+                        .remote_control_triangle
+                        .trigger(TriangleBoreaBTControl::ButtonVolumeDown),
+                    RemoteControllerSource::Wimius => self
+                        .remote_control_wimius
+                        .trigger(WimiusS27Control::ButtonVolumeDown),
+                };
+            }
+            RemoteControllerInputEvent::SoundVolumeUp => {
+                match self.activated_source {
+                    RemoteControllerSource::Apple => self
+                        .remote_control_apple
+                        .trigger(AppleTVControl::ButtonVolumeUp),
+                    RemoteControllerSource::Triangle => self
+                        .remote_control_triangle
+                        .trigger(TriangleBoreaBTControl::ButtonVolumeUp),
+                    RemoteControllerSource::Wimius => self
+                        .remote_control_wimius
+                        .trigger(WimiusS27Control::ButtonVolumeUp),
+                };
+            }
+            RemoteControllerInputEvent::TelevisionBack => {
+                self.activate_source(RemoteControllerSource::Wimius);
+                self.remote_control_wimius
+                    .trigger(WimiusS27Control::ButtonReturn);
+            }
+            RemoteControllerInputEvent::TelevisionDown => {
+                // TODO: add Apple TV.
+                match self.activated_source {
+                    RemoteControllerSource::Wimius => self
+                        .remote_control_wimius
+                        .trigger(WimiusS27Control::ButtonDown),
+                    _ => (),
+                };
+            }
+            RemoteControllerInputEvent::TelevisionHome => {
+                match self.activated_source {
+                    RemoteControllerSource::Wimius => self
+                        .remote_control_wimius
+                        .trigger(WimiusS27Control::ButtonHome),
+                    _ => {
+                        self.activate_source(RemoteControllerSource::Apple);
+                        self.remote_control_apple
+                            .trigger(AppleTVControl::ButtonHome);
+                    }
+                };
+            }
+            RemoteControllerInputEvent::TelevisionLeft => {
+                match self.activated_source {
+                    RemoteControllerSource::Triangle => self
+                        .remote_control_triangle
+                        .trigger(TriangleBoreaBTControl::ButtonTransportBackward),
+                    RemoteControllerSource::Wimius => self
+                        .remote_control_wimius
+                        .trigger(WimiusS27Control::ButtonLeft),
+                    _ => (),
+                };
+            }
+            RemoteControllerInputEvent::TelevisionMenu => {
+                match self.activated_source {
+                    RemoteControllerSource::Wimius => self
+                        .remote_control_wimius
+                        .trigger(WimiusS27Control::ButtonMenu),
+                    _ => {
+                        self.activate_source(RemoteControllerSource::Apple);
+                        self.remote_control_apple
+                            .trigger(AppleTVControl::ButtonMenu);
+                    }
+                };
+            }
+            RemoteControllerInputEvent::TelevisionPlayPause => {
+                match self.activated_source {
+                    RemoteControllerSource::Apple => self
+                        .remote_control_apple
+                        .trigger(AppleTVControl::ButtonTransportPlayPause),
+                    RemoteControllerSource::Triangle => self
+                        .remote_control_triangle
+                        .trigger(TriangleBoreaBTControl::ButtonTransportPlayPause),
+                    RemoteControllerSource::Wimius => self
+                        .remote_control_wimius
+                        .trigger(WimiusS27Control::ButtonOK),
+                };
+            }
+            RemoteControllerInputEvent::TelevisionRight => {
+                match self.activated_source {
+                    RemoteControllerSource::Triangle => self
+                        .remote_control_triangle
+                        .trigger(TriangleBoreaBTControl::ButtonTransportForward),
+                    RemoteControllerSource::Wimius => self
+                        .remote_control_wimius
+                        .trigger(WimiusS27Control::ButtonRight),
+                    _ => (),
+                };
+            }
+            RemoteControllerInputEvent::TelevisionUp => {
+                // TODO: add Apple TV.
+                match self.activated_source {
+                    RemoteControllerSource::Wimius => self
+                        .remote_control_wimius
+                        .trigger(WimiusS27Control::ButtonUp),
+                    _ => (),
+                };
+            }
+            _ => {}
         };
     }
 }
@@ -119,18 +336,7 @@ fn main() -> ! {
             Ok(n) => n,
         };
         if n > 0 {
-            match RemoteControllerInputEvent::from_byte(buffer[0]) {
-                RemoteControllerInputEvent::InputSourceApple => {
-                    outputs.activate_led(RemoteControllerLED::Apple);
-                }
-                RemoteControllerInputEvent::InputSourceTriangle => {
-                    outputs.activate_led(RemoteControllerLED::Triangle);
-                }
-                RemoteControllerInputEvent::InputSourceWimius => {
-                    outputs.activate_led(RemoteControllerLED::Wimius);
-                }
-                _ => {}
-            };
+            outputs.on_input_event(RemoteControllerInputEvent::from_byte(buffer[0]));
         }
         outputs.on_event_loop_iteration();
     }

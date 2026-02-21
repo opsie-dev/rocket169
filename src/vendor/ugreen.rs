@@ -1,5 +1,3 @@
-use crate::com::ir::IRController;
-
 /// Enumeration of every control available on original remote.
 pub enum UGreenAW504Control {
     Button1,
@@ -9,17 +7,11 @@ pub enum UGreenAW504Control {
 }
 
 /// Remote controller interface.
-pub struct UGreenAW504RemoteControl {
-    ir_controller: &IRController,
-}
+pub struct UGreenAW504RemoteControl {}
 
 impl UGreenAW504RemoteControl {
-    pub fn new(
-        ir_controller: &IRController,
-    ) -> UGreenAW504RemoteControl {
-        UGreenAW504RemoteControl {
-            ir_controller: ir_controller,
-        }
+    pub fn new() -> UGreenAW504RemoteControl {
+        UGreenAW504RemoteControl {}
     }
 
     pub fn trigger(&self, control: UGreenAW504Control) {

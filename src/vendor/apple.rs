@@ -1,5 +1,3 @@
-use rocket169::device::RemoteController;
-
 /// Enumeration of every control available on original remote.
 pub enum AppleTVControl {
     ButtonOK,
@@ -12,23 +10,11 @@ pub enum AppleTVControl {
 }
 
 /// Remote controller interface.
-pub struct AppleTVRemoteControl<C>
-where
-    C: IRController,
-{
-    ir_controller: &C,
-}
+pub struct AppleTVRemoteControl {}
 
-impl AppleTVRemoteControl<C>
-where
-    C: IRController
-{
-    pub fn new(
-        ir_controller: &C,
-    ) -> AppleTVRemoteControl<C> {
-        AppleTVRemoteControl {
-            ir_controller: ir_controller,
-        }
+impl AppleTVRemoteControl {
+    pub fn new() -> AppleTVRemoteControl {
+        AppleTVRemoteControl {}
     }
 
     pub fn trigger(&self, control: AppleTVControl) {
