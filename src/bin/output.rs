@@ -52,7 +52,7 @@ impl RemoteControllerOutputs {
             uptime: Instant::now(),
         }
     }
-    fn activate_led(&mut self, led: RemoteControllerLED) -> () {
+    fn activate_led(&mut self, led: RemoteControllerLED) {
         match self.activated_led {
             None => {}
             Some(led) => {
@@ -67,7 +67,7 @@ impl RemoteControllerOutputs {
         self.activated_led = Some(led);
         self.activated_led_instant = Some(Instant::now());
     }
-    fn deactivate_led(&mut self, led: RemoteControllerLED) -> () {
+    fn deactivate_led(&mut self, led: RemoteControllerLED) {
         match led {
             RemoteControllerLED::Apple => self.led_apple.set_low(),
             RemoteControllerLED::Triangle => self.led_triangle.set_low(),
@@ -76,7 +76,7 @@ impl RemoteControllerOutputs {
         self.activated_led = None;
         self.activated_led_instant = None;
     }
-    fn on_event_loop_iteration(&mut self) -> () {
+    fn on_event_loop_iteration(&mut self) {
         match self.activated_led {
             None => {}
             Some(led) => {
