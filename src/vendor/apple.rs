@@ -1,12 +1,14 @@
+use log::debug;
+
 /// Enumeration of every control available on original remote.
 pub enum AppleTVControl {
-    ButtonOK,
-    ButtonMenu,
     ButtonHome,
-    ButtonVoiceAssistant,
+    ButtonMenu,
+    ButtonOK,
     ButtonTransportPlayPause,
-    ButtonVolumeUp,
+    ButtonVoiceAssistant,
     ButtonVolumeDown,
+    ButtonVolumeUp,
 }
 
 /// Remote controller interface.
@@ -18,6 +20,28 @@ impl AppleTVRemoteControl {
     }
 
     pub fn trigger(&self, control: AppleTVControl) {
-        // TODO: implement.
+        match control {
+            AppleTVControl::ButtonHome => {
+                debug!("[AppleTV] Home button triggered");
+            }
+            AppleTVControl::ButtonMenu => {
+                debug!("[AppleTV] Menu button triggered");
+            }
+            AppleTVControl::ButtonOK => {
+                debug!("[AppleTV] OK button triggered");
+            }
+            AppleTVControl::ButtonTransportPlayPause => {
+                debug!("[AppleTV] Play/Pause button triggered");
+            }
+            AppleTVControl::ButtonVoiceAssistant => {
+                debug!("[AppleTV] Siri button triggered");
+            }
+            AppleTVControl::ButtonVolumeDown => {
+                debug!("[AppleTV] Volume down button triggered");
+            }
+            AppleTVControl::ButtonVolumeUp => {
+                debug!("[AppleTV] Volume up button triggered");
+            }
+        }
     }
 }
